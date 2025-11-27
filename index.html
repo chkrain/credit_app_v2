@@ -1,0 +1,1035 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Калькулятор кредитов — Loan Helper</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --muted: #64748b;
+    --accent: #3b82f6;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --border: #e2e8f0;
+    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 100%);
+    color: #0f172a;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  header {
+    padding: 24px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgb(174, 193, 245);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), #6366f1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 16px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 24px;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+
+  label {
+    display: block;
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  input[type="number"], input[type="text"], select, input[type="date"] {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: white;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .field {
+    margin-bottom: 16px;
+  }
+
+  button {
+    background: var(--accent);
+    border: none;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  button:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  button.ghost {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+  }
+
+  button.ghost:hover {
+    background: #f8fafc;
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: none;
+    box-shadow: none;
+  }
+
+  .muted {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  th, td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+
+  th {
+    text-align: left;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  tr:hover {
+    background: #f8fafc;
+  }
+
+  .summary {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .tile {
+    flex: 1;
+    min-width: 160px;
+    background: linear-gradient(135deg, #f8fafc, white);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .warn {
+    background: #fffbeb;
+    padding: 12px;
+    border-radius: 10px;
+    color: #92400e;
+    border: 1px solid #fed7aa;
+  }
+
+  .small {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .share-url {
+    word-break: break-all;
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1.5px dashed var(--border);
+    font-size: 13px;
+  }
+
+  h2 {
+    margin-top: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f172a;
+    margin-top: 0;
+  }
+
+  hr {
+    border: none;
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+  @media (max-width: 1024px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .container {
+      padding: 12px;
+    }
+    
+    header {
+      padding: 20px 16px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .row {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .row > * {
+      width: 100% !important;
+    }
+    
+    .summary {
+      flex-direction: column;
+    }
+    
+    .tile {
+      min-width: auto;
+    }
+  }
+
+  .payment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .payment-item:last-child {
+    border-bottom: none;
+  }
+
+  .counter-display {
+    min-width: 44px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--accent);
+  }
+
+  .saved-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    transition: all 0.2s;
+  }
+
+  .saved-item:hover {
+    background: #f8fafc;
+  }
+
+  .saved-item-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #e2e8f0;
+    color: #475569;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">LH</div>
+  <div>
+    <h1>Калькулятор кредитов</h1>
+    <div class="small">Подробный расчёт платежей, амортизация, напоминания и экспорт/импорт</div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="grid">
+    <!-- LEFT: main calculator -->
+    <div class="card" id="mainCard">
+      <h2>Параметры кредита</h2>
+
+      <div class="field">
+        <label>Сумма кредита</label>
+        <input id="principal" type="number" min="0" step="0.01" value="100000" />
+      </div>
+
+      <div class="field row">
+        <div style="flex:1">
+          <label>Годовой процент (%)</label>
+          <input id="annualRate" type="number" min="0" step="0.01" value="12" />
+        </div>
+        <div style="width:160px">
+          <label>Тип платежа</label>
+          <select id="rateType">
+            <option value="annuity">Аннуитет (равные платежи)</option>
+            <option value="differential">Дифференцированный</option>
+            <option value="simple">Простые проценты</option>
+            <option value="compound">Капитализация</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field row">
+        <div style="width:140px">
+          <label>Срок (число)</label>
+          <input id="termValue" type="number" min="1" value="12" />
+        </div>
+        <div style="width:140px">
+          <label>Единица срока</label>
+          <select id="termUnit">
+            <option value="years">Годы</option>
+            <option value="months" selected>Месяцы</option>
+            <option value="days">Дни</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label>Частота платежей</label>
+          <select id="payFreq">
+            <option value="monthly" selected>Ежемесячно</option>
+            <option value="weekly">Еженедельно</option>
+            <option value="daily">Ежедневно</option>
+            <option value="yearly">Ежегодно</option>
+            <option value="once">Единовременно</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field row">
+        <div style="flex:1">
+          <label>Дата начала (первый платёж)</label>
+          <input id="startDate" type="date" />
+        </div>
+        <div style="width:140px">
+          <label>Валюта</label>
+          <input id="currency" type="text" value="₽" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="calcBtn">Посчитать</button>
+        <button id="saveBtn" class="ghost">Сохранить локально</button>
+        <button id="exportBtn" class="ghost">Экспорт JSON</button>
+      </div>
+
+      <div class="warn small" id="storageWarn">
+        Важно: данные сохраняются в <strong>localStorage</strong>. Не очищайте кеш или не пользуйтесь инкогнито, если хотите сохранить записи.
+      </div>
+
+      <hr/>
+
+      <div id="results" style="display:none">
+        <h3>Итоги</h3>
+        <div class="summary">
+          <div class="tile">
+            <div class="small">Ежемесячный платеж</div>
+            <div id="paymentBig" style="font-weight:700;font-size:18px">—</div>
+          </div>
+          <div class="tile">
+            <div class="small">Всего выплачено</div>
+            <div id="totalPaid" style="font-weight:700;font-size:18px">—</div>
+          </div>
+          <div class="tile">
+            <div class="small">Всего процентов</div>
+            <div id="totalInterest" style="font-weight:700;font-size:18px">—</div>
+          </div>
+        </div>
+
+        <h3 style="margin-top:20px">Амортизационная таблица</h3>
+        <div style="max-height:400px;overflow:auto">
+          <table id="amTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Дата</th>
+                <th>Платёж</th>
+                <th>Тело</th>
+                <th>Проценты</th>
+                <th>Остаток</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button id="exportICS" class="ghost">Экспорт .ics (календарь)</button>
+          <button id="shareUrl" class="ghost">Создать ссылку</button>
+          <input id="generatedUrl" style="flex:1;min-width:200px" readonly class="share-url" />
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: manager / saved loans -->
+    <div>
+      <div class="card">
+        <h3>Сохранённые кредиты</h3>
+        <div id="savedList" style="display:flex;flex-direction:column;gap:8px"></div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button id="importBtn" class="ghost">Импорт JSON</button>
+          <input id="fileInput" type="file" accept="application/json" style="display:none"/>
+          <button id="clearStorage" class="ghost" style="color:var(--danger);border-color:#fecaca">Очистить всё</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <h3>Ближайшие платежи</h3>
+        <div class="small">Напоминания о предстоящих платежах. Экспортируйте .ics для добавления в календарь.</div>
+        <div id="upcoming" style="margin-top:12px"></div>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <h3>Счётчик (ручной)</h3>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button id="decBtn" class="ghost">-</button>
+          <div id="counter" class="counter-display">0</div>
+          <button id="incBtn" class="ghost">+</button>
+          <button id="resetCounter" class="ghost">Сброс</button>
+        </div>
+        <div class="small" style="margin-top:8px">Для подсчёта платежей, дней просрочки и т.д.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px" class="card">
+    <h3>Пояснения</h3>
+    <p class="muted small">
+      <strong>Аннуитет</strong> — равные платежи; часть процентов высчитывается от остатка и уменьшается, часть тела растёт.
+      <br><strong>Дифференцированный</strong> — каждый период возвращается равная часть тела; проценты падают, поэтому платежы сначала большие.
+      <br><strong>Простые проценты</strong> — проценты считаются только от исходной суммы и не капитализируются.
+      <br><strong>Капитализация</strong> — проценты начисляются и добавляются к телу; при варианте "выплата в конце" платёж совершается единовременно с учётом капитализации.
+    </p>
+  </div>
+</div>
+
+<script>
+// ========== Helpers ==========
+const $ = id => document.getElementById(id);
+function fmt(n, cur = '₽') { 
+  return Number(n).toLocaleString('ru-RU', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' ' + cur; 
+}
+
+function daysBetween(a, b) { 
+  return Math.round((b - a) / (1000 * 3600 * 24)); 
+}
+
+function addPeriod(date, freq, count = 1) {
+  const d = new Date(date);
+  if (freq === 'monthly') { 
+    d.setMonth(d.getMonth() + count); 
+  } else if (freq === 'weekly') { 
+    d.setDate(d.getDate() + 7 * count); 
+  } else if (freq === 'daily') { 
+    d.setDate(d.getDate() + count); 
+  } else if (freq === 'yearly') { 
+    d.setFullYear(d.getFullYear() + count); 
+  }
+  return d;
+}
+
+// ========== Storage ==========
+const STORAGE_KEY = 'loanhelper.saved';
+function loadSaved() { 
+  try { 
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); 
+  } catch(e) { 
+    return []; 
+  } 
+}
+
+function saveSaved(arr) { 
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); 
+  renderSaved(); 
+}
+
+// ========== UI wiring ==========
+window.addEventListener('load', () => {
+  // Set default date to today
+  const today = new Date().toISOString().slice(0, 10);
+  $('startDate').value = today;
+  renderSaved();
+  
+  // Load from URL if present
+  try { 
+    loadFromUrlHash(); 
+  } catch(e) { 
+    console.warn('Failed to load from URL', e);
+  }
+  
+  // Initialize counter
+  $('counter').innerText = localStorage.getItem('loanhelper.counter') || '0';
+});
+
+$('calcBtn').addEventListener('click', () => {
+  const state = readForm();
+  const res = calculateLoan(state);
+  showResults(res, state);
+});
+
+$('saveBtn').addEventListener('click', () => {
+  const s = readForm();
+  const saved = loadSaved();
+  const name = prompt('Имя для сохранения (короткое описание):', 'Кредит ' + new Date().toLocaleString());
+  if (!name) return;
+  
+  saved.push({
+    name, 
+    created: new Date().toISOString(), 
+    state: s
+  });
+  
+  saveSaved(saved);
+  alert('Сохранено локально');
+});
+
+$('exportBtn').addEventListener('click', () => {
+  const s = readForm();
+  const blob = new Blob([JSON.stringify(s, null, 2)], {type: 'application/json;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; 
+  a.download = 'loan.json'; 
+  document.body.appendChild(a); 
+  a.click();
+  a.remove(); 
+  URL.revokeObjectURL(url);
+});
+
+$('importBtn').addEventListener('click', () => $('fileInput').click());
+$('fileInput').addEventListener('change', (ev) => {
+  const f = ev.target.files[0]; 
+  if (!f) return;
+  
+  const r = new FileReader(); 
+  r.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      populateForm(data);
+      alert('Импортировано в форму');
+    } catch(err) { 
+      alert('Ошибка формата JSON'); 
+    }
+  }; 
+  r.readAsText(f);
+});
+
+$('clearStorage').addEventListener('click', () => {
+  if (confirm('Удалить все сохранённые кредиты и напоминания? Это действие нельзя отменить.')) {
+    localStorage.removeItem(STORAGE_KEY); 
+    renderSaved();
+  }
+});
+
+$('shareUrl').addEventListener('click', () => {
+  const s = readForm();
+  const enc = btoa(unescape(encodeURIComponent(JSON.stringify(s))));
+  const url = location.origin + location.pathname + '#s=' + enc;
+  $('generatedUrl').value = url;
+});
+
+$('exportICS').addEventListener('click', () => {
+  const s = readForm();
+  const res = calculateLoan(s);
+  const ics = buildICS(res.schedule, s);
+  const blob = new Blob([ics], {type: 'text/calendar;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); 
+  a.download = 'loan_payments.ics'; 
+  document.body.appendChild(a); 
+  a.click();
+  a.remove();
+});
+
+// Counter functionality
+$('incBtn').addEventListener('click', () => updateCounter(1));
+$('decBtn').addEventListener('click', () => updateCounter(-1));
+$('resetCounter').addEventListener('click', () => {
+  localStorage.setItem('loanhelper.counter', '0'); 
+  $('counter').innerText = '0'; 
+});
+
+function updateCounter(delta) {
+  const cur = parseInt(localStorage.getItem('loanhelper.counter') || '0', 10);
+  const next = Math.max(0, cur + delta);
+  localStorage.setItem('loanhelper.counter', String(next));
+  $('counter').innerText = String(next);
+}
+
+// Saved list rendering
+function renderSaved() {
+  const list = loadSaved();
+  const el = $('savedList'); 
+  el.innerHTML = '';
+  
+  if (!list.length) { 
+    el.innerHTML = '<div class="small muted">Нет сохранённых записей</div>'; 
+    return; 
+  }
+  
+  list.slice().reverse().forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = 'saved-item';
+    
+    div.innerHTML = `
+      <div>
+        <div style="font-weight:600;margin-bottom:4px">${item.name}</div>
+        <div class="small muted">${new Date(item.created).toLocaleString()}</div>
+      </div>
+    `;
+    
+    const actions = document.createElement('div');
+    actions.className = 'saved-item-actions';
+    
+    const loadBtn = document.createElement('button'); 
+    loadBtn.className = 'ghost'; 
+    loadBtn.textContent = 'Загрузить';
+    loadBtn.onclick = () => { 
+      populateForm(item.state); 
+      alert('Запись загружена в форму'); 
+    };
+    
+    const shareBtn = document.createElement('button'); 
+    shareBtn.className = 'ghost'; 
+    shareBtn.textContent = 'Поделиться';
+    shareBtn.onclick = () => {
+      const enc = btoa(unescape(encodeURIComponent(JSON.stringify(item.state))));
+      const url = location.origin + location.pathname + '#s=' + enc;
+      prompt('Скопируй ссылку для обмена', url);
+    };
+    
+    const delBtn = document.createElement('button'); 
+    delBtn.className = 'ghost'; 
+    delBtn.textContent = 'Удалить';
+    delBtn.onclick = () => {
+      if (!confirm('Удалить запись?')) return;
+      const arr = loadSaved(); 
+      const index = arr.findIndex(i => i.created === item.created && i.name === item.name);
+      if (index !== -1) {
+        arr.splice(index, 1); 
+        saveSaved(arr);
+      }
+    };
+    
+    actions.appendChild(loadBtn);
+    actions.appendChild(shareBtn);
+    actions.appendChild(delBtn);
+    div.appendChild(actions);
+    el.appendChild(div);
+  });
+}
+
+// Read form values
+function readForm() {
+  const principal = Number($('principal').value) || 0;
+  const annualRate = Number($('annualRate').value) || 0;
+  const rateType = $('rateType').value;
+  const termValue = Number($('termValue').value) || 0;
+  const termUnit = $('termUnit').value;
+  const payFreq = $('payFreq').value;
+  const startDate = $('startDate').value || new Date().toISOString().slice(0, 10);
+  const currency = $('currency').value || '₽';
+  
+  return {principal, annualRate, rateType, termValue, termUnit, payFreq, startDate, currency};
+}
+
+// Populate form from state
+function populateForm(s) {
+  $('principal').value = s.principal ?? 100000;
+  $('annualRate').value = s.annualRate ?? 12;
+  $('rateType').value = s.rateType ?? 'annuity';
+  $('termValue').value = s.termValue ?? 12;
+  $('termUnit').value = s.termUnit ?? 'months';
+  $('payFreq').value = s.payFreq ?? 'monthly';
+  $('startDate').value = s.startDate ?? new Date().toISOString().slice(0, 10);
+  $('currency').value = s.currency ?? '₽';
+}
+
+// Load state from URL hash if present
+function loadFromUrlHash() {
+  if (!location.hash) return;
+  const h = location.hash.slice(1);
+  if (!h.startsWith('s=')) return;
+  
+  const enc = h.slice(2);
+  try {
+    const json = decodeURIComponent(escape(atob(enc)));
+    const state = JSON.parse(json);
+    populateForm(state);
+    alert('Импортировано состояние из ссылки');
+  } catch(e) { 
+    console.warn('Failed to parse URL state', e); 
+  }
+}
+
+// ========== Calculation logic ==========
+function calculateLoan(s) {
+  const {principal, annualRate, rateType, termValue, termUnit, payFreq, startDate, currency} = s;
+  const r = annualRate / 100;
+  
+  // Convert term into number of payment periods
+  const freqMap = {monthly: 12, weekly: 52, daily: 365, yearly: 1, once: 1};
+  const periodPerYear = freqMap[payFreq] || 12;
+
+  // Compute total periods from termUnit and termValue
+  let totalPeriods = 0;
+  if (termUnit === 'years') {
+    totalPeriods = Math.round(termValue * periodPerYear);
+  } else if (termUnit === 'months') {
+    if (payFreq === 'monthly') {
+      totalPeriods = termValue;
+    } else if (payFreq === 'weekly') {
+      totalPeriods = Math.round(termValue * 4.345);
+    } else if (payFreq === 'daily') {
+      totalPeriods = Math.round(termValue * 30.4375);
+    } else {
+      totalPeriods = Math.round(termValue * (12 / periodPerYear));
+    }
+  } else if (termUnit === 'days') {
+    if (payFreq === 'daily') totalPeriods = termValue;
+    else if (payFreq === 'weekly') totalPeriods = Math.ceil(termValue / 7);
+    else if (payFreq === 'monthly') totalPeriods = Math.ceil(termValue / 30);
+    else totalPeriods = Math.max(1, Math.round(termValue / (365 / periodPerYear)));
+  }
+
+  if (totalPeriods <= 0) totalPeriods = 1;
+
+  const start = new Date(startDate);
+  const schedule = [];
+  let balance = principal;
+  let totalInterest = 0;
+  const periodicRate = r / periodPerYear;
+
+  // Handle different calculation types
+  if (rateType === 'simple') {
+    // Simple interest = P * r * T
+    let years = 0;
+    if (termUnit === 'years') years = termValue;
+    else if (termUnit === 'months') years = termValue / 12;
+    else if (termUnit === 'days') years = termValue / 365;
+    
+    const interestTotal = principal * r * years;
+    const totalPay = principal + interestTotal;
+    let perPayment = totalPay;
+    
+    if (payFreq !== 'once' && totalPeriods > 1) {
+      perPayment = totalPay / totalPeriods;
+    }
+    
+    for (let i = 1; i <= totalPeriods; i++) {
+      const date = addPeriod(start, payFreq, i - 1);
+      const interestPaid = interestTotal / totalPeriods;
+      const principalPaid = perPayment - interestPaid;
+      balance = Math.max(0, balance - principalPaid);
+      
+      schedule.push({
+        num: i, 
+        date: date.toISOString().slice(0, 10), 
+        payment: perPayment, 
+        principalPaid, 
+        interestPaid, 
+        balance
+      });
+      
+      totalInterest += interestPaid;
+    }
+    
+    return {schedule, totalInterest, totalPaid: principal + totalInterest, currency};
+  }
+
+  if (rateType === 'compound') {
+    // Compound interest
+    const finalAmount = principal * Math.pow(1 + periodicRate, totalPeriods);
+    
+    if (payFreq === 'once' || totalPeriods === 1) {
+      const date = addPeriod(start, payFreq, totalPeriods - 1);
+      const interestPaid = finalAmount - principal;
+      schedule.push({
+        num: 1, 
+        date: date.toISOString().slice(0, 10), 
+        payment: finalAmount, 
+        principalPaid: principal, 
+        interestPaid, 
+        balance: 0
+      });
+      
+      return {schedule, totalInterest: interestPaid, totalPaid: finalAmount, currency};
+    } else {
+      // Amortize compounded amount
+      const r_p = periodicRate;
+      let annuityPay = 0;
+      
+      if (r_p === 0) {
+        annuityPay = finalAmount / totalPeriods;
+      } else {
+        annuityPay = finalAmount * r_p / (1 - Math.pow(1 + r_p, -totalPeriods));
+      }
+      
+      balance = finalAmount;
+      
+      for (let i = 1; i <= totalPeriods; i++) {
+        const date = addPeriod(start, payFreq, i - 1);
+        const interestPaid = balance * r_p;
+        const principalPaid = annuityPay - interestPaid;
+        balance = Math.max(0, balance - principalPaid);
+        
+        schedule.push({
+          num: i, 
+          date: date.toISOString().slice(0, 10), 
+          payment: annuityPay, 
+          principalPaid, 
+          interestPaid, 
+          balance
+        });
+        
+        totalInterest += interestPaid;
+      }
+      
+      return {schedule, totalInterest, totalPaid: annuityPay * totalPeriods, currency};
+    }
+  }
+
+  if (rateType === 'annuity') {
+    // Standard annuity calculation
+    const r_p = periodicRate;
+    let annuityPay = 0;
+    
+    if (r_p === 0) {
+      annuityPay = principal / totalPeriods;
+    } else {
+      annuityPay = principal * r_p / (1 - Math.pow(1 + r_p, -totalPeriods));
+    }
+    
+    for (let i = 1; i <= totalPeriods; i++) {
+      const date = addPeriod(start, payFreq, i - 1);
+      const interestPaid = balance * r_p;
+      const principalPaid = annuityPay - interestPaid;
+      balance = Math.max(0, balance - principalPaid);
+      
+      schedule.push({
+        num: i, 
+        date: date.toISOString().slice(0, 10), 
+        payment: annuityPay, 
+        principalPaid, 
+        interestPaid, 
+        balance
+      });
+      
+      totalInterest += interestPaid;
+    }
+    
+    return {schedule, totalInterest, totalPaid: annuityPay * totalPeriods, currency};
+  }
+
+  if (rateType === 'differential') {
+    // Differentiated payments
+    const principalPart = principal / totalPeriods;
+    
+    for (let i = 1; i <= totalPeriods; i++) {
+      const date = addPeriod(start, payFreq, i - 1);
+      const interestPaid = balance * periodicRate;
+      const payment = principalPart + interestPaid;
+      balance = Math.max(0, balance - principalPart);
+      
+      schedule.push({
+        num: i, 
+        date: date.toISOString().slice(0, 10), 
+        payment, 
+        principalPaid: principalPart, 
+        interestPaid, 
+        balance
+      });
+      
+      totalInterest += interestPaid;
+    }
+    
+    return {schedule, totalInterest, totalPaid: principal + totalInterest, currency};
+  }
+
+  // Fallback
+  return {schedule: [], totalInterest: 0, totalPaid: 0, currency};
+}
+
+// Show results in UI
+function showResults(res, s) {
+  $('results').style.display = 'block';
+  const cur = s.currency || '₽';
+  const pay = res.schedule.length ? res.schedule[0].payment : 0;
+  
+  $('paymentBig').innerText = fmt(pay, cur);
+  $('totalPaid').innerText = fmt(res.totalPaid, cur);
+  $('totalInterest').innerText = fmt(res.totalInterest, cur);
+
+  const tbody = $('amTable').querySelector('tbody'); 
+  tbody.innerHTML = '';
+  
+  res.schedule.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="text-align:left">${row.num}</td>
+      <td style="text-align:left">${row.date}</td>
+      <td>${fmt(row.payment, cur)}</td>
+      <td>${fmt(row.principalPaid, cur)}</td>
+      <td>${fmt(row.interestPaid, cur)}</td>
+      <td>${fmt(row.balance, cur)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  renderUpcoming(res.schedule, cur);
+}
+
+// Build ICS calendar file from schedule
+function buildICS(schedule, s) {
+  function dtToICS(d) {
+    const D = new Date(d);
+    const Y = D.getUTCFullYear();
+    const M = String(D.getUTCMonth() + 1).padStart(2, '0');
+    const Da = String(D.getUTCDate()).padStart(2, '0');
+    return `${Y}${M}${Da}T090000Z`;
+  }
+  
+  let ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//LoanHelper//EN\r\nCALSCALE:GREGORIAN\r\n";
+  
+  schedule.forEach((p, i) => {
+    ics += "BEGIN:VEVENT\r\n";
+    ics += "UID:" + (Date.now() + i) + "@loanhelper\r\n";
+    ics += "DTSTAMP:" + dtToICS(new Date()) + "\r\n";
+    ics += "DTSTART:" + dtToICS(p.date) + "\r\n";
+    ics += "SUMMARY:Платёж по кредиту — " + (s.currency || '₽') + Math.round(p.payment * 100) / 100 + "\r\n";
+    ics += "DESCRIPTION:Платёж: " + (s.currency || '₽') + Math.round(p.payment * 100) / 100 + "\\nТело: " + 
+            Math.round(p.principalPaid * 100) / 100 + "\\nПроценты: " + Math.round(p.interestPaid * 100) / 100 + "\r\n";
+    ics += "END:VEVENT\r\n";
+  });
+  
+  ics += "END:VCALENDAR";
+  return ics;
+}
+
+// Upcoming payments list
+function renderUpcoming(schedule, currency) {
+  const el = $('upcoming'); 
+  el.innerHTML = '';
+
+  const today = new Date();
+  const upcoming = schedule.filter(s => new Date(s.date) >= today).slice(0, 6);
+  
+  if (!upcoming.length) { 
+    el.innerHTML = '<div class="small muted">Нет предстоящих платежей</div>'; 
+    return; 
+  }
+  
+  upcoming.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'payment-item';
+    
+    div.innerHTML = `
+      <div>
+        <div style="font-weight:600">${p.date}</div>
+        <div class="small muted">Платёж №${p.num}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:600">${fmt(p.payment, currency)}</div>
+        <div class="small muted">Остаток: ${fmt(p.balance, currency)}</div>
+      </div>
+    `;
+    
+    el.appendChild(div);
+  });
+}
+</script>
+
+</body>
+</html>
