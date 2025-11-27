@@ -85,6 +85,10 @@
   input:focus, select:focus{outline:none;border-color:var(--accent);box-shadow:0 6px 18px rgba(37,99,235,0.08)}
 
   .row{display:flex;gap:12px;align-items:center}
+  @media(max-width:760px){
+    .row{flex-direction: column;}
+    .field{width: 100% !important;}
+  }
   .row > div{flex:1}
 
   .actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
