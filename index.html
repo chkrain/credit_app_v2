@@ -24,6 +24,7 @@
     color-scheme: light;
   }
   *{box-sizing:border-box}
+  html{overflow-x: hidden;}
   html,body{height:100%}
   body{
     margin:0;
@@ -36,6 +37,12 @@
     -moz-osx-font-smoothing:grayscale;
     line-height:1.4;
     padding:28px;
+  }
+
+  @media screen and (max-width: 760px) {
+      body{
+      padding:4px;
+    }
   }
 
   .wrap{
@@ -71,6 +78,10 @@
     padding:18px;
     box-shadow:var(--shadow);
     border:1px solid var(--border);
+  }
+
+  @media screen and (max-width: 760px) {
+    .card {margin-bottom: 22px; margin-top: 0 !important;}
   }
 
   label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
